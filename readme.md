@@ -273,7 +273,7 @@ The code here heavily derives from the wonderful work of previous projects. We s
 If it's useful for you, please star/cite the package, and make sure to give authors of original methods / base implementations credit:
 
 ```r
-@software{
+@article{
     imodels2021,
     title        = {imodels: a python package for fitting interpretable models},
     journal      = {Journal of Open Source Software},
