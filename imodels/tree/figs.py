@@ -146,6 +146,7 @@ class FIGS(BaseEstimator):
         y = y.astype(float)
         if feature_names is not None:
             self.feature_names_ = feature_names
+        self.classes_ = np.unique(y)
 
         self.trees_ = []  # list of the root nodes of added trees
         self.complexity_ = 0  # tracks the number of rules in the model
@@ -278,15 +279,20 @@ class FIGS(BaseEstimator):
             return preds
         elif self.prediction_task == 'classification':
             return (preds > 0.5).astype(int)
-
-    def predict_proba(self, X):
+        
+    def decision_function(self, X):
         X = check_array(X)
         if self.prediction_task == 'regression':
             return NotImplemented
-        preds = np.zeros(X.shape[0])
+        scores = np.zeros(X.shape[0])
         for tree in self.trees_:
-            preds += self._predict_tree(tree, X)
-        preds = np.clip(preds, a_min=0., a_max=1.)  # constrain to range of probabilities
+            scores += self._predict_tree(tree, X)
+        return scores
+
+    def predict_proba(self, X):
+        X = check_array(X)
+        scores = self.decision_function(X)
+        preds = np.clip(scores, a_min=0., a_max=1.)  # constrain to range of probabilities
         return np.vstack((1 - preds, preds)).transpose()
 
     def _predict_tree(self, root: Node, X):
